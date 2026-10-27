@@ -37,6 +37,14 @@ python3 scripts/validate_pack.py /path/to/project/delivery/manifest.json --repor
 python3 -m unittest discover -s tests -v
 ```
 
+动态表情可使用统一导出工具：
+
+```bash
+python3 scripts/export_animation.py /path/to/project/sources/sequence.json --output-dir /path/to/project/previews/export-01
+```
+
+工具支持帧序列与帧网格裁切，保留每帧时长，统一调色板并合并连续重复帧，导出 GIF、浅/深背景逐帧对照和检查报告。可指定静止区域，标出帧间变化；角色身份、比例和动作质量仍需视觉检查。清单格式与草样/最终动画标准见 [动态制作说明](references/animated.md)。
+
 规格基线采用用户提供的微信素材概览截图，详见 [微信交付要求](references/wechat-delivery.md)。检查通过仅代表文件符合该基线，视觉表现、实际聊天效果与微信审核需另外核对。Skill 不自动向微信投稿。
 
-当前版本：0.1.0。尚未完成真实静态／动态整套生成的端到端验收。
+当前版本：0.2.0。已完成三种动态方向草样测试，尚未完成真实静态／动态整套生成的端到端验收。
