@@ -39,8 +39,4 @@ python3 -m unittest discover -s tests -v
 
 规格基线采用用户提供的微信素材概览截图，详见 [微信交付要求](references/wechat-delivery.md)。检查通过仅代表文件符合该基线，视觉表现、实际聊天效果与微信审核需另外核对。Skill 不自动向微信投稿。
 
-## 设计思路
-
-流程借鉴 [huashu-design](https://github.com/alchaincyf/huashu-design) 的上下文理解、可视方向比较、规范固定与交付验证，重新组织为表情包的角色设定、聊天表达和成套一致性工作流；不依赖其安装，也没有复制其代码或风格资产。
-
 当前版本：0.1.0。尚未完成真实静态／动态整套生成的端到端验收。
