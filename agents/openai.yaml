@@ -1,0 +1,4 @@
+interface:
+  display_name: "微信表情包设计"
+  short_description: "从主题或已有形象制作成套微信静态与动态表情，交付名称及配套素材"
+  default_prompt: "使用 $expression-design 帮我做一套微信表情包，先确定静态或动态，再根据我提供的主题或已有形象选择流程。"
