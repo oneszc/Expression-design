@@ -2,3 +2,7 @@ __pycache__/
 *.pyc
 .DS_Store
 .venv/
+
+# Local generated sticker projects; keep source assets and deliveries off GitHub.
+/examples/monday-blues/
+/output/expression-design/

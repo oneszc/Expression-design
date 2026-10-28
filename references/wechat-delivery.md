@@ -27,7 +27,7 @@
   "mode": "static",
   "count": 8,
   "stickers": [
-    {"file": "stickers/01.png", "meaning": "收到", "text": "收到"}
+    {"file": "stickers/收到.png", "meaning": "收到", "text": "收到"}
   ],
   "banner": "banner.png",
   "cover": "cover.png",
@@ -36,6 +36,8 @@
 ```
 
 实际 `stickers` 数组必须列全 8～24 张，与 `count` 一致。`mode` 为 `static` 或 `animated`；`name_status` 为 `confirmed` 或 `provisional`。每张必有不空的 `meaning`，`text` 可为空字符串。所有路径相对 manifest 所在目录，不接受绝对路径、目录外路径或重复引用。动态表情主图应有至少两个不同帧并无限循环；横幅、封面和图标为静态。
+
+表情文件按聊天含义命名，例如 `周一开机失败.gif`，不使用纯编号或默认编号前缀。名字可以与 `meaning` 一致，也可以压缩成长短适合的短语；不要求图中出现同样的文字。同名使用动作/语气后缀区分，不覆盖已有文件。清理首尾空白以及 `/`、`\`、`:`、`*`、`?`、`"`、`<`、`>`、`|` 等跨平台不适合的文件名字符，清理后再次检查空名称和重名。序号用于表达清单的排序，文件顺序由 manifest 的数组表达，不依赖文件名。该命名约定是 Skill 的交付规则，不冒充微信平台规定；校验器仍可读取旧的编号清单。
 
 ```bash
 python3 <skill目录>/scripts/validate_pack.py <项目>/delivery/manifest.json --report <项目>/validation.json
