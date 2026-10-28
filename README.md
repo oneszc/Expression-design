@@ -45,6 +45,8 @@ python3 -m unittest discover -s tests -v
 
 动态表情可使用统一导出工具：
 
+制作先设计关键姿态与动作节奏，再按动作选逐帧、可变形分层或混合方式。复用素材不等于只做刚性旋转和缩放；先验证少量代表动画的自然度、画风及接触关系，再批量扩展。以下工具负责编码，不负责生成动作或判断表演质量。
+
 ```bash
 python3 scripts/export_animation.py /path/to/project/sources/sequence.json --output-dir /path/to/project/previews/export-01
 ```
@@ -53,4 +55,4 @@ python3 scripts/export_animation.py /path/to/project/sources/sequence.json --out
 
 规格基线采用用户提供的微信素材概览截图，详见 [微信交付要求](references/wechat-delivery.md)。检查通过仅代表文件符合该基线，视觉表现、实际聊天效果与微信审核需另外核对。Skill 不自动向微信投稿。
 
-当前版本：0.2.1。已完成动态方向草样与一套 8 张动态素材初版的生成、导出和文件规格检查；案例发现的帧稳定、裁切及验收问题已用于优化制作流程。原速播放与完整视觉验收尚未完成，不能据此宣称动态路线已通过端到端验收；真实静态整套仍待验证。
+当前版本：0.2.2。动态测试已发现逐帧生成漂移与刚性分层动作机械的问题，制作指导改为先验证表演与关键姿态，再按动作选择路线。此更新是流程修正，尚未通过新的动画案例验证；原速播放与完整视觉验收仍未完成，真实静态整套也待验证。
