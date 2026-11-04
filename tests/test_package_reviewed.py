@@ -22,7 +22,8 @@ class PackageReviewedTest(unittest.TestCase):
         self.manifest = self.root / "manifest.json"
         self.review = self.root / "review.json"
         self.output = self.root / "approved.zip"
-        data = {"profile": "wechat-user-2026-10-27", "name": "测试", "name_status": "confirmed",
+        data = {"profile": "wechat-user-2026-11-04", "name": "测试", "name_status": "confirmed",
+                "description": "用于合成测试的表情清单。",
                 "mode": "static", "count": 8, "stickers": [], "banner": "banner.png",
                 "cover": "cover.png", "icon": "icon.png"}
         names = []
@@ -45,6 +46,10 @@ class PackageReviewedTest(unittest.TestCase):
                 "scores": {"identity": 20, "expression": 20, "craft": 26, "legibility": 15},
                 "evidence": {key: "Synthetic boundary fixture" for key in module.LIMITS},
                 "checks": {"light": True, "dark": True}})
+            for role in ("banner", "cover", "icon"):
+                if name == data[role]:
+                    self.record["items"][-1]["checks"][role + "_design"] = True
+                    self.record["items"][-1]["platform_evidence"] = "Synthetic WeChat design check, not real review"
 
     def image(self, name, size, index):
         im = Image.new("RGBA", size)
@@ -73,6 +78,10 @@ class PackageReviewedTest(unittest.TestCase):
         self.record["items"][0]["scores"]["legibility"] = 14
         self.rejected()
         self.record["items"][0]["scores"]["legibility"] = True
+        self.rejected()
+
+    def test_missing_wechat_design_review_rejected(self):
+        self.record["items"][-1]["checks"].pop("icon_design")
         self.rejected()
 
     def test_high_score_cannot_hide_critical_defect_or_weak_expression(self):

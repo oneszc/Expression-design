@@ -24,6 +24,7 @@ class ValidatePackTest(unittest.TestCase):
         self.path = self.root / "manifest.json"
         self.data = {
             "profile": module.PROFILE, "name": "慢半拍", "name_status": "confirmed",
+            "description": "慢半拍的小伙伴，用慵懒表情回应日常聊天。",
             "mode": "static", "count": 8, "stickers": [],
             "banner": "banner.png", "cover": "cover.png", "icon": "icon.png",
         }
@@ -47,6 +48,31 @@ class ValidatePackTest(unittest.TestCase):
         result = self.check()
         self.assertTrue(result["valid"], result["errors"])
         self.assertEqual(len(result["files"]), 11)
+
+    def test_name_limits_and_punctuation(self):
+        for name in ["一二三四五六七八九", "小卷！", "小卷-A", "小卷。", "小卷~", "小卷～", "小卷`", "小卷＋"]:
+            self.data["name"] = name
+            self.assertFalse(self.check()["valid"], name)
+        self.data["name"] = "一二三四五六七八"
+        self.assertTrue(self.check()["valid"])
+        self.assertTrue(any("5 characters" in w for w in self.check()["warnings"]))
+
+    def test_description_required_and_length_boundary(self):
+        for text in [None, "", "   ", "字" * 81]:
+            self.data["description"] = text
+            self.assertFalse(self.check()["valid"])
+        self.data["description"] = "字" * 80
+        self.assertTrue(self.check()["valid"])
+
+    def test_opaque_cover_and_icon_rejected(self):
+        for name, size in [("cover.png", (240, 240)), ("icon.png", (50, 50))]:
+            Image.new("RGB", size, "white").save(self.root / name)
+        result = self.check()
+        self.assertEqual(sum("requires a transparent background" in e for e in result["errors"]), 2)
+
+    def test_legacy_profile_not_silently_upgraded(self):
+        self.data["profile"] = "wechat-user-2026-10-27"
+        self.assertFalse(self.check()["valid"])
 
     def test_valid_animated(self):
         self.data["mode"] = "animated"

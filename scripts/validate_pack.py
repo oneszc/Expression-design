@@ -4,13 +4,15 @@
 import argparse
 import hashlib
 import json
+import string
 import sys
+import unicodedata
 from pathlib import Path
 
 from PIL import Image, UnidentifiedImageError
 
 
-PROFILE = "wechat-user-2026-10-27"
+PROFILE = "wechat-user-2026-11-04"
 FORMATS = {".png": "PNG", ".jpg": "JPEG", ".jpeg": "JPEG", ".gif": "GIF"}
 
 
@@ -30,6 +32,23 @@ def validate(manifest_path):
         errors.append(f"Unsupported profile; expected {PROFILE}")
     if not isinstance(data.get("name"), str) or not data["name"].strip():
         errors.append("A non-empty pack name is required")
+    else:
+        name = data["name"]
+        if len(name) > 8:
+            errors.append("Pack name must not exceed 8 characters")
+        if any(unicodedata.category(char).startswith("P")
+               or any(part in string.punctuation for part in unicodedata.normalize("NFKC", char))
+               for char in name):
+            errors.append("Pack name must not contain punctuation")
+        if any(char.isspace() for char in name):
+            warnings.append("Avoid whitespace in the pack name")
+        if len(name) > 5:
+            warnings.append("Pack names within 5 characters display best")
+    description = data.get("description")
+    if not isinstance(description, str) or not description.strip():
+        errors.append("A non-empty pack description is required")
+    elif len(description) > 80:
+        errors.append("Pack description must not exceed 80 characters")
     if data.get("name_status") not in ("confirmed", "provisional"):
         errors.append("name_status must be confirmed or provisional")
     elif data["name_status"] == "provisional":
@@ -91,6 +110,7 @@ def validate(manifest_path):
                 first_frame = None
                 changed = False
                 transparent = False
+                clear_pixel = False
                 digest = hashlib.sha256()
                 duration = 0
                 for frame_index in range(item["frames"]):
@@ -104,6 +124,7 @@ def validate(manifest_path):
                         changed = True
                     alpha_low, alpha_high = frame.getextrema()[3]
                     transparent = transparent or alpha_low < 255
+                    clear_pixel = clear_pixel or alpha_low == 0
                     if alpha_high == 0:
                         errors.append(f"{relative}: frame {frame_index} is fully transparent")
                     if animated:
@@ -112,6 +133,10 @@ def validate(manifest_path):
                             errors.append(f"{relative}: frame {frame_index} has no positive duration")
                         duration += frame_duration
                 item["has_transparency"] = transparent
+                if role in ("cover", "icon") and not clear_pixel:
+                    errors.append(f"{relative}: {role} requires a transparent background")
+                if role == "banner" and transparent:
+                    warnings.append(f"{relative}: avoid transparent backgrounds for the banner")
                 if animated:
                     item["duration_ms"] = duration
                     if not changed:
@@ -143,6 +168,7 @@ def validate(manifest_path):
     check_image(data.get("cover"), "cover", (240, 240), {"PNG"}, 500_000)
     check_image(data.get("icon"), "icon", (50, 50), {"PNG"}, 100_000)
     warnings.append("Visual consistency, text, loop quality and current WeChat acceptance require human review")
+    warnings.append("Album name uniqueness and description accuracy require manual verification")
     report["valid"] = not errors
     return report
 

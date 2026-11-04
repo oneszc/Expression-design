@@ -81,6 +81,11 @@ def prepare(manifest_path, review_path):
             required += ["all_frames", "playback"]
             require(isinstance(item.get("playback_evidence"), str) and item["playback_evidence"].strip(),
                     f"{name}: original-speed playback evidence required")
+        for role in ("banner", "cover", "icon"):
+            if name == manifest[role]:
+                required.append(role + "_design")
+                require(isinstance(item.get("platform_evidence"), str) and item["platform_evidence"].strip(),
+                        f"{name}: WeChat {role} design evidence required")
         require(isinstance(checks, dict) and all(checks.get(key) is True for key in required),
                 f"{name}: required observation missing")
         snapshot[name] = data

@@ -36,7 +36,7 @@
 
 `file`与manifest相对路径完全一致，`stage`为final。四维分数必须为范围内整数，满分依次25/25/35/15；脚本自己求和，不信任另写的total。表达至少18且合计>80。
 
-静态素材只要求light/dark；动态表情另要求all_frames/playback和非空playback_evidence。不能为了让脚本通过把未观察写true。证据不足时相关分数null、decision为blocked，并在unchecked记录缺项，脚本会拒绝。有明确问题时decision为revise并写修复建议，返修流程见 [独立评审与返修](review.md)。
+静态素材均要求light/dark；动态表情另要求all_frames/playback和非空playback_evidence。三项配套图还分别要求checks.banner_design、checks.cover_design或checks.icon_design为true，以及该项非空platform_evidence；具体核对文字、背景、正面半身/全身或头部、白描边、锯齿、留白及已知跨专辑重复，见 [微信交付要求](wechat-delivery.md)。示例是表情主图，不代表配套图可以省略这些字段。不能为了让脚本通过把未观察写true。证据不足时相关分数null、decision为blocked，并在unchecked记录缺项，脚本会拒绝。有明确问题时decision为revise并写修复建议，返修流程见 [独立评审与返修](review.md)。
 
 ## 执行
 
