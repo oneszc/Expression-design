@@ -1,16 +1,42 @@
-# Expression Design
+<div align="center">
 
-**一句话，开始制作一套有自己语气的微信表情。**
+<h1>Expression Design</h1>
 
-从主题探索角色与画风，或沿用你已有的形象，把日常口头禅、职场吐槽和朋友之间的梗，变成一套风格统一、表达各异的静态或动态表情。
+<h3>一句话，开始制作一套有自己语气的微信表情。</h3>
 
-角色、动作、配字、横幅、封面、聊天图标，一起规划与交付。
+<p>从主题探索角色与画风，或沿用已有形象，制作风格统一、表达各异的静态与动态表情。</p>
 
-角色示例 · 小卷已老实
+<p>角色 · 动作 · 配字 · 横幅 · 封面 · 聊天图标</p>
 
-| 收到 | 我裂开了 | 溜了溜了 |
-|:---:|:---:|:---:|
-| ![慵懒地抬爪回应收到](assets/showcase/收到.gif) | ![瞪眼捂脸表达我裂开了](assets/showcase/我裂开了.gif) | ![起身跑两步再坐回的溜了溜了](assets/showcase/溜了溜了.gif) |
+<p>
+  <img src="https://img.shields.io/badge/version-v0.2.8-2563eb?style=flat-square" alt="版本 v0.2.8">
+  <img src="https://img.shields.io/badge/WeChat-stickers-07c160?style=flat-square" alt="微信表情">
+  <img src="https://img.shields.io/badge/format-static%20%2B%20animated-7c3aed?style=flat-square" alt="静态与动态">
+  <img src="https://img.shields.io/badge/review-independent-f59e0b?style=flat-square" alt="独立评审">
+</p>
+
+<p>
+  <a href="#quick-start">安装与使用</a> ·
+  <a href="#features">功能介绍</a> ·
+  <a href="#delivery">交付内容</a> ·
+  <a href="#docs">文档与工具</a>
+</p>
+
+<br>
+
+<p>
+  <img src="assets/showcase/收到.gif" width="180" alt="慵懒地抬爪回应收到">
+  <img src="assets/showcase/我裂开了.gif" width="180" alt="瞪眼捂脸表达我裂开了">
+  <img src="assets/showcase/溜了溜了.gif" width="180" alt="起身跑两步再坐回的溜了溜了">
+</p>
+
+<p><sub>角色示例 · 小卷已老实</sub></p>
+
+</div>
+
+---
+
+<a id="quick-start"></a>
 
 ## 快速开始
 
@@ -29,6 +55,8 @@ npx skills add oneszc/Expression-design
 > 做一套“别急着学 AI”的表情，先搜最近流行的表达作参考。
 
 也可以把完整仓库放入 Agent 的 skills 目录，文件夹命名为 `expression-design`，保留其中的参考文档与脚本。
+
+<a id="features"></a>
 
 ## 从一个梗，发展成一整套
 
@@ -72,6 +100,8 @@ npx skills add oneszc/Expression-design
 
 交付前由脚本核对素材规格、评审记录和当前文件版本，检查通过再打包。评分辅助筛选，最终的角色方向和喜好由你决定。流程详见 [独立评审与返修](references/review.md)。
 
+<a id="delivery"></a>
+
 ## 一套交付包含什么
 
 | 内容 | 数量与规格 |
@@ -92,6 +122,8 @@ npx skills add oneszc/Expression-design
 随附导出与检查脚本需要 Python 3.10+ 和 Pillow。FFmpeg、Node 等按需使用；开始前检查依赖，缺失时提供用途、安装提示和替代方案。详见 [环境与工具选择](references/environment.md)。
 
 项目默认保存在工作区的 `output/expression-design/项目名/`。源图、过程素材与评审记录留在本地，ZIP只包含交付清单和最终素材，不自动提交GitHub或上传微信。
+
+<a id="docs"></a>
 
 ## 文档与工具
 
