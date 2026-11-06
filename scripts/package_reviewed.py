@@ -11,6 +11,7 @@ import zipfile
 from pathlib import Path, PurePosixPath
 
 from validate_pack import validate
+from review_records import verify_assembled
 
 
 LIMITS = {"identity": 25, "expression": 25, "craft": 35, "legibility": 15}
@@ -37,7 +38,7 @@ def prepare(manifest_path, review_path):
     manifest_bytes = manifest_path.read_bytes()
     manifest = json.loads(manifest_bytes)
     review = json.loads(Path(review_path).read_bytes())
-    require(isinstance(review, dict) and review.get("schema_version") == 1,
+    require(isinstance(review, dict) and review.get("schema_version") in (1, 2),
             "Unsupported review schema")
     require(isinstance(review.get("reviewer_id"), str) and review["reviewer_id"].strip(),
             "Independent reviewer_id is required")
@@ -45,6 +46,8 @@ def prepare(manifest_path, review_path):
     technical = validate(manifest_path)
     require(technical["valid"], "Technical validation failed: " + "; ".join(technical["errors"]))
     require(manifest_path.read_bytes() == manifest_bytes, "Manifest changed during validation")
+    if review["schema_version"] == 2:
+        verify_assembled(manifest_path, review)
     names = [item["file"] for item in manifest["stickers"]]
     names += [manifest[key] for key in ("banner", "cover", "icon")]
     items = review.get("items")
@@ -79,7 +82,8 @@ def prepare(manifest_path, review_path):
         required = ["light", "dark"]
         if name in animated_names:
             required += ["all_frames", "playback"]
-            require(isinstance(item.get("playback_evidence"), str) and item["playback_evidence"].strip(),
+            require(((isinstance(item.get("playback_evidence"), str) and item["playback_evidence"].strip())
+                     or (review["schema_version"] == 2 and isinstance(item.get("playback_evidence"), dict))),
                     f"{name}: original-speed playback evidence required")
         for role in ("banner", "cover", "icon"):
             if name == manifest[role]:

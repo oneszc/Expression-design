@@ -6,3 +6,6 @@ __pycache__/
 # Local generated sticker projects; keep source assets and deliveries off GitHub.
 /examples/monday-blues/
 /output/expression-design/
+
+# Local production notes for writing; keep unpublished process records local.
+/docs/制作记录.md

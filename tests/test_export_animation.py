@@ -53,6 +53,19 @@ class ExportAnimationTest(unittest.TestCase):
         self.assertEqual(result["input_entries"], 4)
         self.assertEqual(result["encoded_frames"], 3)
         self.assertEqual(result["encoded_durations_ms"], [350, 300, 200])
+        self.assertEqual(result["merged_groups"], [{"source_frames": [0, 1], "duration_ms": 350, "source_pixels_differ": False}])
+        self.assertTrue(any("frames merged" in warning for warning in result["warnings"]))
+
+    def test_source_difference_lost_at_alpha_threshold_is_reported(self):
+        with Image.open(self.root / '0.png') as source:
+            altered = source.convert('RGBA')
+        altered.putpixel((1, 1), (200, 100, 50, 60))
+        altered.save(self.root / 'subtle.png')
+        self.data['frames'].insert(1, {'file': 'subtle.png', 'duration_ms': 100})
+        report = self.run_export()
+        self.assertTrue(report['merged_groups'][0]['source_pixels_differ'])
+        self.assertTrue(any('lost movement' in text for text in report['warnings']))
+        self.assertEqual(report['duration_ms'], 700)
 
     def test_fixed_region_and_intentional_movement(self):
         self.data["stable_regions"] = [{"name": "desk", "rect": [20, 190, 200, 20]}]

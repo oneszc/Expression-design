@@ -9,7 +9,7 @@
 <p>角色 · 动作 · 配字 · 横幅 · 封面 · 聊天图标</p>
 
 <p>
-  <img src="https://img.shields.io/badge/version-v0.2.8-2563eb?style=flat-square" alt="版本 v0.2.8">
+  <img src="https://img.shields.io/badge/version-v0.2.9-2563eb?style=flat-square" alt="版本 v0.2.9">
   <img src="https://img.shields.io/badge/WeChat-stickers-07c160?style=flat-square" alt="微信表情">
   <img src="https://img.shields.io/badge/format-static%20%2B%20animated-7c3aed?style=flat-square" alt="静态与动态">
   <img src="https://img.shields.io/badge/review-independent-f59e0b?style=flat-square" alt="独立评审">
@@ -96,9 +96,9 @@ npx skills add oneszc/Expression-design
 
 **单项总分超过 80 分、表达分至少 18/25，且没有关键缺陷、必要检查完整，才作为合格结果主动展示。** 整套还会横向检查画风、动作和语义是否协调、有区别。
 
-发现问题后针对具体项返修，默认最多 2 轮，再重新评审。动态重点检查表演、位置稳定、恢复和循环；封面与聊天图标则按实际尺寸检查辨识度与边缘。
+发现问题后针对具体项返修，默认最多 2 轮，再重新评审；非阻断建议不会让制作无限继续。支持逐项保存进度和中断后继续。动态重点检查表演、位置稳定、恢复和循环；封面与聊天图标则按实际尺寸检查辨识度与边缘。
 
-交付前由脚本核对素材规格、评审记录和当前文件版本，检查通过再打包。评分辅助筛选，最终的角色方向和喜好由你决定。流程详见 [独立评审与返修](references/review.md)。
+交付前由脚本核对素材规格、评审记录和当前文件版本，检查通过再打包。宿主无法观察动画播放时，可由你在本地预览页确认原速效果，再合并验收；待验收预览和合格素材包有明确区分。评分辅助筛选，最终的角色方向和喜好由你决定。流程详见 [独立评审与返修](references/review.md)。
 
 <a id="delivery"></a>
 
@@ -117,7 +117,7 @@ npx skills add oneszc/Expression-design
 
 ## 在你的 Agent 中使用
 
-需要支持 Skill、图像生成或编辑、独立子 Agent 的环境。动态制作还需要连续动作制作、导出，以及能观察实际播放的工具。图像模型由 Agent 当前可用能力提供，可按自己的工具环境选择制作路线。
+需要支持 Skill、图像生成或编辑、独立子 Agent 的环境。动态制作还需要连续动作制作、导出，以及实际播放验收；宿主无法观察连续播放时，由用户通过本地预览完成。图像模型由 Agent 当前可用能力提供，可按自己的工具环境选择制作路线。
 
 随附导出与检查脚本需要 Python 3.10+ 和 Pillow。FFmpeg、Node 等按需使用；开始前检查依赖，缺失时提供用途、安装提示和替代方案。详见 [环境与工具选择](references/environment.md)。
 
@@ -134,6 +134,7 @@ npx skills add oneszc/Expression-design
 | 动作、节拍与循环 | [动态制作参考](references/animated.md) |
 | 如何借鉴热门表情 | [联网参考](references/research.md) |
 | 评分与返修 | [独立评审](references/review.md) |
+| 预算、进度与中断恢复 | [执行与收尾](references/runtime.md) |
 | 评审文件与交付打包 | [报告格式与打包工具](references/review-report.md) |
 
 <details>
@@ -164,4 +165,4 @@ python3 -m venv .venv
 
 ---
 
-Expression Design · v0.2.8
+Expression Design · v0.2.9

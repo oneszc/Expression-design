@@ -113,22 +113,24 @@ def encode(frames, durations, colors, alpha_threshold):
         board.paste(frame, (0, index * SIZE[1]))
     palette = board.quantize(colors=colors, method=Image.Quantize.MEDIANCUT,
                              dither=Image.Dither.NONE)
-    indexed, times = [], []
-    for frame, mask, duration in zip(rgb, masks, durations):
+    indexed, times, groups = [], [], []
+    for source_index, (frame, mask, duration) in enumerate(zip(rgb, masks, durations)):
         output = frame.quantize(palette=palette, dither=Image.Dither.NONE)
         output.paste(255, mask=mask)
         output.info["transparency"] = 255
         if indexed and output.tobytes() == indexed[-1].tobytes() and times[-1] + duration <= 655_350:
             times[-1] += duration
+            groups[-1].append(source_index)
         else:
             indexed.append(output)
             times.append(duration)
+            groups.append([source_index])
     if len(indexed) < 2:
         return None
     stream = io.BytesIO()
     indexed[0].save(stream, format="GIF", save_all=True, append_images=indexed[1:],
                     duration=times, loop=0, transparency=255, disposal=2, optimize=False)
-    return stream.getvalue()
+    return stream.getvalue(), groups
 
 
 def contact_sheet(frames, durations, background):
@@ -159,7 +161,7 @@ def export(sequence_path, output_dir, alpha_threshold=128):
         candidate = encode(frames, durations, colors, alpha_threshold)
         if candidate is None:
             raise ValueError("animation collapsed after palette/alpha conversion; revise source frames")
-        payload = candidate
+        payload, groups = candidate
         attempts.append({"colors": colors, "bytes": len(payload)})
         if len(payload) <= LIMIT:
             break
@@ -174,7 +176,14 @@ def export(sequence_path, output_dir, alpha_threshold=128):
         if sum(encoded_durations) != sum(durations) or len(fingerprints) < 2:
             raise ValueError("encoded GIF lost timing or visible animation")
         encoded_frames = gif.n_frames
+    merges = [{"source_frames": group, "duration_ms": sum(durations[i] for i in group),
+               "source_pixels_differ": any(frames[i].tobytes() != frames[group[0]].tobytes() for i in group[1:])}
+              for group in groups if len(group) > 1]
     warnings = ["Visual review required: identity, timing, loop join and transparent edges"]
+    if merges:
+        warnings.append("Consecutive frames merged after palette/alpha conversion; inspect merged_groups. Intentional holds are valid")
+    if any(group["source_pixels_differ"] for group in merges):
+        warnings.append("Different source pixels collapsed during encoding; inspect possible lost movement, not an automatic failure")
     if not regions:
         warnings.append("No fixed regions supplied; no automatic frame stability judgment was made")
     if any(region["flagged_frames"] for region in regions):
@@ -187,7 +196,7 @@ def export(sequence_path, output_dir, alpha_threshold=128):
               "input_entries": len(frames), "encoded_frames": encoded_frames,
               "duration_ms": sum(durations), "encoded_durations_ms": encoded_durations,
               "palette_attempts": attempts, "alpha_threshold": alpha_threshold,
-              "stable_regions": regions, "warnings": warnings}
+              "stable_regions": regions, "merged_groups": merges, "warnings": warnings}
     output_dir.mkdir(parents=True, exist_ok=False)
     (output_dir / "animation.gif").write_bytes(payload)
     (output_dir / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
