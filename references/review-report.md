@@ -54,7 +54,7 @@ python3 <skill>/scripts/review_records.py <项目>/delivery/manifest.json --frag
 python3 <skill>/scripts/preview_pack.py <项目>/delivery/manifest.json --output-dir <项目>/previews/验收-01
 ```
 
-输出index.html、实际素材字节副本、最终解码的浅深底全帧图、status.json、playback-pending.json，以及明确命名的“待验收预览.zip”。预览并非合格交付包；包含状态和过程对照，不能重命名冒充合格包。页面没有自动签收功能；浏览器打开成功不等于已观察播放。浏览器决定实际播放调度，原速指不人为更改GIF时间线。
+输出index.html、不可变素材快照、最终解码的浅深底全帧图、status.json和playback-pending.json。相同输入复用已有预览，逐项缓存与硬链接减少重复存储；读取命令返回的实际路径。默认不生成ZIP；用户明确需要便携预览包时才附加--bundle，生成“待验收预览.zip”。缓存与清理见 [空间管理](runtime.md)。预览并非合格交付包；包含状态和过程对照，不能重命名冒充合格包。页面没有自动签收功能；浏览器打开成功不等于已观察播放。浏览器决定实际播放调度，原速指不人为更改GIF时间线。
 
 用户逐张在浅/深底至少看两轮并明确确认后，将playback-pending.json另存为新的验收记录，填真实observer、confirmed_at、user_confirmation原文；每项填写loops≥2、light/dark=true、decision=pass及具体evidence。已有file/sha256必须保持与所看快照一致，不重新计算当前文件哈希替换旧快照。仅笼统“看起来不错”且验收范围不明时，不能推定全部两轮验收。文件改变后只让变更项的旧确认失效。
 

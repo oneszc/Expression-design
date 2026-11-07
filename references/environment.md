@@ -27,7 +27,7 @@ python3 -c 'import sys; print(sys.version); sys.exit(0 if sys.version_info >= (3
 python3 -c 'import PIL; print(PIL.__version__)'
 ```
 
-缺 Pillow 时，提示“随附 GIF 导出和文件规格检查需要 Pillow；当前解释器无法导入。建议在项目虚拟环境安装，已有授权则执行，否则先确认安装”。不要往全局 Python 强装。以已验证的 Python 3.10+ 创建环境，以下路径按实际项目和 Skill 安装位置替换：
+先检查本轮已有的、已授权使用的解释器或虚拟环境能否导入Pillow，能用就复用；不因新建表情项目就无条件再建一份环境。确实缺 Pillow 时，提示“随附 GIF 导出和文件规格检查需要 Pillow；当前解释器无法导入。建议在项目虚拟环境安装，已有授权则执行，否则先确认安装”。不要往全局 Python 强装。以已验证的 Python 3.10+ 创建环境，以下路径按实际项目和 Skill 安装位置替换：
 
 ```bash
 python3 -m venv /path/to/project/.venv

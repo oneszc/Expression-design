@@ -9,7 +9,7 @@
 <p>角色 · 动作 · 配字 · 横幅 · 封面 · 聊天图标</p>
 
 <p>
-  <img src="https://img.shields.io/badge/version-v0.2.9-2563eb?style=flat-square" alt="版本 v0.2.9">
+  <img src="https://img.shields.io/badge/version-v0.2.10-2563eb?style=flat-square" alt="版本 v0.2.10">
   <img src="https://img.shields.io/badge/WeChat-stickers-07c160?style=flat-square" alt="微信表情">
   <img src="https://img.shields.io/badge/format-static%20%2B%20animated-7c3aed?style=flat-square" alt="静态与动态">
   <img src="https://img.shields.io/badge/review-independent-f59e0b?style=flat-square" alt="独立评审">
@@ -96,7 +96,7 @@ npx skills add oneszc/Expression-design
 
 **单项总分超过 80 分、表达分至少 18/25，且没有关键缺陷、必要检查完整，才作为合格结果主动展示。** 整套还会横向检查画风、动作和语义是否协调、有区别。
 
-发现问题后针对具体项返修，默认最多 2 轮，再重新评审；非阻断建议不会让制作无限继续。支持逐项保存进度和中断后继续。动态重点检查表演、位置稳定、恢复和循环；封面与聊天图标则按实际尺寸检查辨识度与边缘。
+发现问题后针对具体项返修，默认最多 2 轮，再重新评审；非阻断建议不会让制作无限继续。支持逐项保存进度和中断后继续。相同输入复用已有构建，只重建变更素材；过程文件有空间预算与受保护的旧版清理。动态重点检查表演、位置稳定、恢复和循环；封面与聊天图标则按实际尺寸检查辨识度与边缘。
 
 交付前由脚本核对素材规格、评审记录和当前文件版本，检查通过再打包。宿主无法观察动画播放时，可由你在本地预览页确认原速效果，再合并验收；待验收预览和合格素材包有明确区分。评分辅助筛选，最终的角色方向和喜好由你决定。流程详见 [独立评审与返修](references/review.md)。
 
@@ -147,10 +147,14 @@ python3 -m venv .venv
 .venv/bin/python -m pip install -r requirements.txt
 
 # 从帧序列导出 GIF
-.venv/bin/python scripts/export_animation.py /path/to/project/sources/sequence.json --output-dir /path/to/project/previews/export-01
+.venv/bin/python scripts/export_animation.py /path/to/project/sources/收到/sequence.json --project /path/to/project --asset 收到 --output-dir /path/to/project/build/收到/v1
 
 # 检查整套文件规格
 .venv/bin/python scripts/validate_pack.py /path/to/project/delivery/manifest.json --report /path/to/project/validation.json
+
+# 查看过程空间与旧构建清理计划（此命令不删除）
+.venv/bin/python scripts/project_storage.py /path/to/project inspect
+.venv/bin/python scripts/project_storage.py /path/to/project prune
 
 # 核对最终评审并打包
 .venv/bin/python scripts/package_reviewed.py /path/to/project/delivery/manifest.json /path/to/project/reviews/round-1/final.json --output /path/to/project/stickers-approved.zip
@@ -159,10 +163,10 @@ python3 -m venv .venv
 .venv/bin/python -m unittest discover -s tests -v
 ```
 
-导出目录、报告及 ZIP 使用新路径，保留已有版本。清单与评审格式见对应参考文档。
+不同输入的导出、报告及 ZIP 使用新路径；相同输入复用已有产物，读取命令返回的实际目录。旧构建按执行参考中的保留规则清理。清单与评审格式见对应参考文档。
 
 </details>
 
 ---
 
-Expression Design · v0.2.9
+Expression Design · v0.2.10

@@ -118,16 +118,15 @@ class WorkflowTest(unittest.TestCase):
 
     def test_preview_copies_exact_bytes_and_never_accepts(self):
         self.animated()
-        folder = self.root / 'preview'
+        folder = self.root / 'previews' / 'first'
         result = preview(self.manifest, folder)
         self.assertEqual(result['status'], 'pending_acceptance')
         receipt = json.loads((folder / 'playback-pending.json').read_text())
         self.assertTrue(all(i['decision'] == 'pending' and i['loops'] == 0 for i in receipt['items']))
         self.assertEqual((folder / 'assets' / self.record['items'][0]['file']).read_bytes(),
                          (self.root / self.record['items'][0]['file']).read_bytes())
-        self.assertTrue((folder / '待验收预览.zip').exists())
-        with self.assertRaises(ValueError):
-            preview(self.manifest, folder)
+        self.assertFalse((folder / '待验收预览.zip').exists())
+        self.assertTrue(preview(self.manifest, folder)['reused'])
 
     def test_cli_schema2_preview_and_package(self):
         import subprocess
@@ -138,7 +137,7 @@ class WorkflowTest(unittest.TestCase):
             [sys.executable, str(folder / 'review_records.py'), str(self.manifest), '--fragments', str(fragment), '--check-only'],
             [sys.executable, str(folder / 'review_records.py'), str(self.manifest), '--fragments', str(fragment), '--batch', str(batch), '--output', str(report)],
             [sys.executable, str(folder / 'package_reviewed.py'), str(self.manifest), str(report), '--output', str(self.output)],
-            [sys.executable, str(folder / 'preview_pack.py'), str(self.manifest), '--output-dir', str(self.root / 'preview')],
+            [sys.executable, str(folder / 'preview_pack.py'), str(self.manifest), '--output-dir', str(self.root / 'previews' / 'first')],
         ]
         for command in commands:
             result = subprocess.run(command, capture_output=True, text=True)
@@ -171,8 +170,8 @@ class WorkflowTest(unittest.TestCase):
             return result
         with patch.object(preview_pack, 'validate', side_effect=swap):
             with self.assertRaisesRegex(ValueError, 'Snapshot validation'):
-                preview(self.manifest, self.root / 'preview')
-        self.assertFalse((self.root / 'preview').exists())
+                preview(self.manifest, self.root / 'previews' / 'first')
+        self.assertFalse((self.root / 'previews' / 'first').exists())
 
     def test_draft_checks_but_cannot_package_as_final(self):
         fragment, batch = self.fragments()

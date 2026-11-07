@@ -147,13 +147,34 @@ def contact_sheet(frames, durations, background):
     return sheet
 
 
-def export(sequence_path, output_dir, alpha_threshold=128):
+def export(sequence_path, output_dir, alpha_threshold=128, project=None, asset=None):
     output_dir = Path(output_dir)
-    if output_dir.exists() or output_dir.is_symlink():
-        raise ValueError("output directory already exists; choose a new directory")
+
     if type(alpha_threshold) is not int or not 1 <= alpha_threshold <= 255:
         raise ValueError("alpha threshold must be 1..255")
     data, frames, durations = load_sequence(sequence_path)
+    from project_storage import digest, ensure_budget, find, owned_path, seal
+    if project is None:
+        for parent in output_dir.absolute().parents:
+            if parent.name in ('build', 'previews'):
+                project = parent.parent
+                break
+    key = None
+    if project is not None:
+        project = Path(project).resolve()
+        output_dir = owned_path(project, output_dir)
+        asset = asset or str(Path(sequence_path).resolve().parent)
+        key = digest(json.dumps({'stage': data['stage'], 'durations': durations,
+            'regions': data.get('stable_regions', []), 'alpha': alpha_threshold,
+            'frames': [digest(f.tobytes()) for f in frames],
+            'exporter': digest(Path(__file__).read_bytes())}, sort_keys=True).encode())
+        existing = find(project, 'build', asset, key)
+        if existing:
+            result = json.loads((existing / 'report.json').read_text())
+            return {**result, 'output_dir': str(existing), 'reused': True}
+        ensure_budget(project)
+    if output_dir.exists() or output_dir.is_symlink():
+        raise ValueError("output directory already exists; choose a new directory")
     regions = stability_checks(frames, data.get("stable_regions", []))
     attempts = []
     payload = None
@@ -197,12 +218,23 @@ def export(sequence_path, output_dir, alpha_threshold=128):
               "duration_ms": sum(durations), "encoded_durations_ms": encoded_durations,
               "palette_attempts": attempts, "alpha_threshold": alpha_threshold,
               "stable_regions": regions, "merged_groups": merges, "warnings": warnings}
+    sheets = {}
+    for theme, background in [('light', '#ffffff'), ('dark', '#242424')]:
+        stream = io.BytesIO()
+        contact_sheet(frames, durations, background).save(stream, format='PNG')
+        sheets[f'contact-{theme}.png'] = stream.getvalue()
+    if project is not None:
+        ensure_budget(project, len(payload) + sum(map(len, sheets.values())) + len(json.dumps(report).encode()) + 8192)
     output_dir.mkdir(parents=True, exist_ok=False)
     (output_dir / "animation.gif").write_bytes(payload)
     (output_dir / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-    contact_sheet(frames, durations, "#ffffff").save(output_dir / "contact-light.png")
-    contact_sheet(frames, durations, "#242424").save(output_dir / "contact-dark.png")
-    return report
+    for name, content in sheets.items():
+        (output_dir / name).write_bytes(content)
+    if project is not None:
+        source_root = Path(sequence_path).resolve().parent
+        inputs = [Path(sequence_path).resolve()] + [(source_root / f['file']).resolve() for f in data['frames']]
+        seal(project, output_dir, 'build', asset, key, inputs)
+    return {**report, 'output_dir': str(output_dir), 'reused': False}
 
 
 def main():
@@ -210,9 +242,11 @@ def main():
     parser.add_argument("sequence", type=Path)
     parser.add_argument("--output-dir", type=Path, required=True)
     parser.add_argument("--alpha-threshold", type=int, default=128)
+    parser.add_argument("--project", type=Path)
+    parser.add_argument("--asset", help="Stable semantic asset name, unchanged across versions")
     args = parser.parse_args()
     try:
-        report = export(args.sequence, args.output_dir, args.alpha_threshold)
+        report = export(args.sequence, args.output_dir, args.alpha_threshold, args.project, args.asset)
     except (OSError, ValueError, KeyError, TypeError, EOFError, Image.DecompressionBombError) as exc:
         parser.exit(1, f"Export failed: {exc}\n")
     print(json.dumps(report, ensure_ascii=False, indent=2))

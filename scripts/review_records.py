@@ -2,6 +2,7 @@
 """Validate immutable review fragments and assemble a provenance-preserving report."""
 import argparse
 import copy
+import errno
 import hashlib
 import json
 import os
@@ -35,7 +36,15 @@ def write_new(path, value):
         with tempfile.NamedTemporaryFile(mode="w", encoding="utf-8", dir=path.parent, delete=False) as handle:
             temporary = Path(handle.name)
             handle.write(payload)
-        os.link(temporary, path)
+        try:
+            os.link(temporary, path)
+        except OSError as exc:
+            if exc.errno not in (errno.EXDEV, errno.EPERM, errno.EOPNOTSUPP, errno.ENOSYS):
+                raise
+            # Filesystems without hard links still get exclusive, non-clobbering writes.
+            # A killed fallback write can be partial; JSON/hash checks reject it on resume.
+            with path.open("x", encoding="utf-8") as fallback:
+                fallback.write(payload)
     finally:
         if temporary is not None:
             temporary.unlink(missing_ok=True)

@@ -9,6 +9,7 @@ import tempfile
 from pathlib import Path
 
 from review_records import check_fragments, digest, read, require, write_new
+from project_storage import inventory
 
 
 def save(path, state):
@@ -48,7 +49,11 @@ def update(path, action, *, asset=None, file=None, task_id=None, names=None, aut
     state = read(path)
     now = time.time() if now is None else now
     if action == 'status':
-        return status(state, now)
+        result = status(state, now)
+        result['storage'] = inventory(path.parent)
+        if result['storage']['budget_exceeded']:
+            result['stop_reasons'].append('process_storage_budget_exhausted')
+        return result
     require(action in ('candidate', 'review-start', 'review-progress', 'review-stop', 'pause', 'resume', 'freeze'), 'Unknown state action')
     if action in ('candidate', 'review-start'):
         require(state['active_since'] is not None and state['phase'] != 'frozen', 'Project paused/frozen')

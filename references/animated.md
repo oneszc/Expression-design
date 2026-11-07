@@ -92,10 +92,10 @@
 从帧网格提取时，帧条目可增加 `"crop": [x, y, width, height]`，坐标基于源图。网格尺寸必须经过检查，格数或边距不符时不要盲目等分。逐帧检查完整手脚、头顶符号、道具及边缘是否越格；越格或混入邻帧时重新排布或生成独立帧，不能裁掉自身肢体来隐藏邻格残片。优先输出独立帧，统一主体基准比例并为最大动作预留空间。稳定区域坐标则基于导出的 240×240 画布；没有适用区域可以省略 `stable_regions`。
 
 ```bash
-python3 <skill目录>/scripts/export_animation.py <项目>/sources/sequence.json --output-dir <项目>/previews/export-01
+python3 <skill目录>/scripts/export_animation.py <项目>/sources/收到/sequence.json --project <项目> --asset 收到 --output-dir <项目>/build/收到/v1
 ```
 
-输出目录必须是新目录，包含：
+项目内相同输入会复用既有结果并返回实际output_dir，不再创建新版本。新输入仍要求新目录，不覆盖已有文件；输出包含：
 
 - `animation.gif`：240×240 无限循环 GIF，共用调色板和透明索引。
 - `report.json`：各帧时长、总时长、大小、调色板尝试、稳定区域提示；merged_groups列出被合并的源帧索引（从0开始）、合并时长及源像素是否不同。像素不同却合并时提示可能丢失细微动作；不把所有合并或300ms停顿判为缺陷。
